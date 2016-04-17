@@ -4,6 +4,6 @@ Initially written to automate spelling long sums for legal documents such as con
 
 Usage:
 
-`./numerator.py [integer]`
+`./cli.py [integer]`
 
 where [integer] is any positive integer value from 0 to 999,999,999,999,999.

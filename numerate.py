@@ -3,7 +3,6 @@
 
 from math import log
 from random import randint
-from sys import argv
 
 def numerate (numeral):
 
@@ -121,20 +120,3 @@ def numerate (numeral):
 
     # Return string with stripping extra spaces
     return spelled.strip()
-
-# Unix-like CLI:
-
-# Main function
-def main(argv):
-    if len(argv) < 1:
-        print("Please input one positive integer argument.")
-    elif len(argv) == 1:
-        try:
-            print(numerate(argv[0]))
-        except KeyError:
-            print ("Error: Probably, the provided argument is not an integer.")
-    else:
-        print("More than one argument is not supported yet.")
-
-if __name__ == "__main__":
-   main(argv[1:])
