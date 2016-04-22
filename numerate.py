@@ -3,58 +3,50 @@
 
 from math import log
 from random import randint
+from csv import reader
 
-def numerate (numeral):
+class LanguageResources(object):
+    """Container for language resources such as maps and replacement tables"""
+    def __init__(self, lang):
+        self.lang = lang
 
-    # Map digits and digit combinations to their English names
-    onesMap = {
-        "0" : "zero",
-        "1" : "one",
-        "2" : "two",
-        "3" : "three",
-        "4" : "four",
-        "5" : "five",
-        "6" : "six",
-        "7" : "seven",
-        "8" : "eight",
-        "9" : "nine"
-    }
-    teensMap = {
-        "10" : "ten",
-        "11" : "eleven",
-        "12" : "twelve",
-        "13" : "thirteen",
-        "14" : "fourteen",
-        "15" : "fifteen",
-        "16" : "sixteen",
-        "17" : "seventeen",
-        "18" : "eighteen",
-        "19" : "nineteen",
-    }
+        # Define a list of resources we want to fetch
+        resourcesList = ["replacementTable", "onesMap", "teensMap", "tensMap", "groupsMap"]
 
-    tensMap = {
-        "2" : "twenty",
-        "3" : "thirty",
-        "4" : "forty",
-        "5" : "fifty",
-        "6" : "sixty",
-        "7" : "seventy",
-        "8" : "eighty",
-        "9" : "ninety"
-    }
+        for resource in resourcesList:
+            # Init an empty dictonary for the resource
+            exec("self."+resource+"={}")
 
-    groupsMap = {
-        "1" : "hundred",
-        "2" : "thousand",
-        "3" : "million",
-        "4" : "billion",
-        "5" : "trillion"
-    }
+            # Open a file with current resource
+            try:
+                f = open("./langres/{0}/{1}.csv".format(lang, resource), mode = "r")
+            except FileNotFoundError:
+                print("This language is not supported yet. Defaulting to English.")
+                lang = "en"
+                f = open("./langres/{0}/{1}.csv".format(lang, resource), mode = "r")
+
+            # Cycle through the parsed csv file to populate current resources
+            for item in reader(f.readlines()):
+                # Handle empty replacement table
+                try:
+                    exec("self."+resource+"[item[0]] = item[1].strip()")
+                except IndexError:
+                    #exec("self."+resource+"['nA'] = 'nA'")
+                    pass
+
+            # File hygiene
+            f.close()
+
+            #eval("print(self."+resource+")")
+
+
+def numerate (numeral, lang):
+
+    lr = LanguageResources(lang)
 
     # Special case: if numeral == 0 then return "zero" and return
     if numeral == 0:
-        return onesMap[str(numeral)]
-
+        return lr.onesMap[str(numeral)]
 
     # Split into groups:
 
@@ -90,7 +82,7 @@ def numerate (numeral):
         # If a group has hundreds i.e. "100"
         if len(groups[i]) > 2:
             if groups[i][0:1] != "0":
-                spelled += onesMap[groups[i][0:1]] + " " + "hundred" + " "
+                spelled += lr.onesMap[groups[i][0:1]] + " " + lr.groupsMap["1"] + " "
 
         # If a group has tens i.e. "010"
         if len(groups[i]) > 1:
@@ -101,22 +93,32 @@ def numerate (numeral):
             l = len(groups[i]) - 1
 
             # Add "teens", i.e. "011" into string
-            if groups[i][j:k] in teensMap:
-                spelled += teensMap[groups[i][j:k]] + " "
+            if groups[i][j:k] in lr.teensMap:
+                spelled += lr.teensMap[groups[i][j:k]] + " "
                 teens = True
 
             # Add "tens", i.e. "010" into string
-            if groups[i][-2] in tensMap:
-                spelled += tensMap[groups[i][-2]] + " "
+            if groups[i][-2] in lr.tensMap:
+                spelled += lr.tensMap[groups[i][-2]] + " "
 
         # Add ones, i.e. "001" into string
         if groups[i][-1] != "0" and teens != True:
-            spelled += onesMap[groups[i][-1]] + " "
+            spelled += lr.onesMap[groups[i][-1]] + " "
 
         # Add group name e.g. billion 3
-        if groupsMap[str(numGroups - i)] != "hundred":
+        if lr.groupsMap[str(numGroups - i)] != lr.groupsMap["1"]:
             if groups[i] != "000":
-                spelled += groupsMap[str(numGroups - i)] + " "
+                spelled += lr.groupsMap[str(numGroups - i)] + " "
 
-    # Return string with stripping extra spaces
-    return spelled.strip()
+    # Return the final string after post-processing
+    return postProcess(spelled.strip(), lr)
+
+
+def postProcess(string, lr):
+    """Language-specific post-processing to avoid changing general logic"""
+
+    # Replace irregularities using replacement table
+    for i in list(lr.replacementTable.keys()):
+        string = string.replace(i, lr.replacementTable[i])
+
+    return string

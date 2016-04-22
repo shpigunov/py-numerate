@@ -4,6 +4,8 @@ Initially written to automate spelling long sums for legal documents such as con
 
 Usage:
 
-`./cli.py [integer]`
+`./cli.py [lang] [integer]`
 
-where [integer] is any positive integer value from 0 to 999,999,999,999,999.
+where:
+* [lang] is a language code, i.e. "en" for English.
+* [integer] is any positive integer value from 0 to 999,999,999,999,999.
