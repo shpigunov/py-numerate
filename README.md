@@ -1,4 +1,4 @@
-#Create spelled figures from Roman numerals in Python 3
+#Spell numbers in different languages in Python 3
 
 Initially written to automate spelling long sums for legal documents such as contracts, invoices, etc.
 

@@ -1,8 +1,6 @@
 #!/usr/local/bin/python3
 # Create spelled figures from numerals in Python 3
 
-from math import log
-from random import randint
 from csv import reader
 
 class LanguageResources(object):
